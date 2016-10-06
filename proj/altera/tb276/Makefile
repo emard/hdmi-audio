@@ -35,7 +35,7 @@ include ../include/altera.mk
 # Setup your sources here
 SRCS = \
 top/hdmiaudio_tb276.vhd \
-clocks/pll_25M_250M_25M.vhd \
+clocks/clk_25M_125M_25M.vhd \
 ../../../modules/video-generator/vga.vhd \
 ../../../modules/hdmi-audio/av_hdmi.vhd \
 ../../../modules/hdmi-audio/hdmidataencoder.v \

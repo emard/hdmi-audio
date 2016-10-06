@@ -4,7 +4,7 @@
 -- MODULE: altpll 
 
 -- ============================================================
--- File Name: pll_25M_250M_25M.vhd
+-- File Name: clk_25M_125M_25M.vhd
 -- Megafunction Name(s):
 -- 			altpll
 --
@@ -39,7 +39,7 @@ USE ieee.std_logic_1164.all;
 LIBRARY altera_mf;
 USE altera_mf.all;
 
-ENTITY pll_25M_250M_25M IS
+ENTITY clk_25M_125M_25M IS
 	PORT
 	(
 		areset		: IN STD_LOGIC  := '0';
@@ -48,10 +48,10 @@ ENTITY pll_25M_250M_25M IS
 		c1		: OUT STD_LOGIC ;
 		locked		: OUT STD_LOGIC 
 	);
-END pll_25M_250M_25M;
+END clk_25M_125M_25M;
 
 
-ARCHITECTURE SYN OF pll_25m_250m_25m IS
+ARCHITECTURE SYN OF clk_25m_125m_25m IS
 
 	SIGNAL sub_wire0	: STD_LOGIC_VECTOR (4 DOWNTO 0);
 	SIGNAL sub_wire1	: STD_LOGIC ;
@@ -150,7 +150,7 @@ BEGIN
 		bandwidth_type => "AUTO",
 		clk0_divide_by => 1,
 		clk0_duty_cycle => 50,
-		clk0_multiply_by => 10,
+		clk0_multiply_by => 5,
 		clk0_phase_shift => "0",
 		clk1_divide_by => 1,
 		clk1_duty_cycle => 50,
@@ -159,7 +159,7 @@ BEGIN
 		compensate_clock => "CLK0",
 		inclk0_input_frequency => 40000,
 		intended_device_family => "Cyclone IV E",
-		lpm_hint => "CBX_MODULE_PREFIX=pll_25M_250M_25M",
+		lpm_hint => "CBX_MODULE_PREFIX=clk_25M_125M_25M",
 		lpm_type => "altpll",
 		operation_mode => "NORMAL",
 		pll_type => "AUTO",
@@ -241,7 +241,7 @@ END SYN;
 -- Retrieval info: PRIVATE: DIV_FACTOR1 NUMERIC "1"
 -- Retrieval info: PRIVATE: DUTY_CYCLE0 STRING "50.00000000"
 -- Retrieval info: PRIVATE: DUTY_CYCLE1 STRING "50.00000000"
--- Retrieval info: PRIVATE: EFF_OUTPUT_FREQ_VALUE0 STRING "250.000000"
+-- Retrieval info: PRIVATE: EFF_OUTPUT_FREQ_VALUE0 STRING "125.000000"
 -- Retrieval info: PRIVATE: EFF_OUTPUT_FREQ_VALUE1 STRING "25.000000"
 -- Retrieval info: PRIVATE: EXPLICIT_SWITCHOVER_COUNTER STRING "0"
 -- Retrieval info: PRIVATE: EXT_FEEDBACK_RADIO STRING "0"
@@ -270,7 +270,7 @@ END SYN;
 -- Retrieval info: PRIVATE: MULT_FACTOR0 NUMERIC "1"
 -- Retrieval info: PRIVATE: MULT_FACTOR1 NUMERIC "1"
 -- Retrieval info: PRIVATE: NORMAL_MODE_RADIO STRING "1"
--- Retrieval info: PRIVATE: OUTPUT_FREQ0 STRING "250.00000000"
+-- Retrieval info: PRIVATE: OUTPUT_FREQ0 STRING "125.00000000"
 -- Retrieval info: PRIVATE: OUTPUT_FREQ1 STRING "25.00000000"
 -- Retrieval info: PRIVATE: OUTPUT_FREQ_MODE0 STRING "1"
 -- Retrieval info: PRIVATE: OUTPUT_FREQ_MODE1 STRING "1"
@@ -293,7 +293,7 @@ END SYN;
 -- Retrieval info: PRIVATE: PLL_PFDENA_CHECK STRING "0"
 -- Retrieval info: PRIVATE: PLL_TARGET_HARCOPY_CHECK NUMERIC "0"
 -- Retrieval info: PRIVATE: PRIMARY_CLK_COMBO STRING "inclk0"
--- Retrieval info: PRIVATE: RECONFIG_FILE STRING "pll_25M_250M_25M.mif"
+-- Retrieval info: PRIVATE: RECONFIG_FILE STRING "clk_25M_125M_25M.mif"
 -- Retrieval info: PRIVATE: SACN_INPUTS_CHECK STRING "0"
 -- Retrieval info: PRIVATE: SCAN_FEATURE_ENABLED STRING "1"
 -- Retrieval info: PRIVATE: SELF_RESET_LOCK_LOSS STRING "0"
@@ -319,7 +319,7 @@ END SYN;
 -- Retrieval info: CONSTANT: BANDWIDTH_TYPE STRING "AUTO"
 -- Retrieval info: CONSTANT: CLK0_DIVIDE_BY NUMERIC "1"
 -- Retrieval info: CONSTANT: CLK0_DUTY_CYCLE NUMERIC "50"
--- Retrieval info: CONSTANT: CLK0_MULTIPLY_BY NUMERIC "10"
+-- Retrieval info: CONSTANT: CLK0_MULTIPLY_BY NUMERIC "5"
 -- Retrieval info: CONSTANT: CLK0_PHASE_SHIFT STRING "0"
 -- Retrieval info: CONSTANT: CLK1_DIVIDE_BY NUMERIC "1"
 -- Retrieval info: CONSTANT: CLK1_DUTY_CYCLE NUMERIC "50"
@@ -387,11 +387,11 @@ END SYN;
 -- Retrieval info: CONNECT: c0 0 0 0 0 @clk 0 0 1 0
 -- Retrieval info: CONNECT: c1 0 0 0 0 @clk 0 0 1 1
 -- Retrieval info: CONNECT: locked 0 0 0 0 @locked 0 0 0 0
--- Retrieval info: GEN_FILE: TYPE_NORMAL pll_25M_250M_25M.vhd TRUE
--- Retrieval info: GEN_FILE: TYPE_NORMAL pll_25M_250M_25M.ppf TRUE
--- Retrieval info: GEN_FILE: TYPE_NORMAL pll_25M_250M_25M.inc FALSE
--- Retrieval info: GEN_FILE: TYPE_NORMAL pll_25M_250M_25M.cmp TRUE
--- Retrieval info: GEN_FILE: TYPE_NORMAL pll_25M_250M_25M.bsf FALSE
--- Retrieval info: GEN_FILE: TYPE_NORMAL pll_25M_250M_25M_inst.vhd FALSE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL clk_25M_125M_25M.vhd TRUE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL clk_25M_125M_25M.ppf TRUE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL clk_25M_125M_25M.inc FALSE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL clk_25M_125M_25M.cmp TRUE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL clk_25M_125M_25M.bsf FALSE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL clk_25M_125M_25M_inst.vhd FALSE
 -- Retrieval info: LIB_FILE: altera_mf
 -- Retrieval info: CBX_MODULE_PREFIX: ON

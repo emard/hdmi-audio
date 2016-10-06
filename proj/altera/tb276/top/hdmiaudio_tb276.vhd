@@ -9,12 +9,14 @@ entity hdmiaudio_tb276 is
 port
 (
   clk_25m: in std_logic;
-  --rs232_txd: out std_logic;
-  --rs232_rxd: in std_logic;
   led: out std_logic_vector(7 downto 0);
-  gpio: inout std_logic_vector(47 downto 0);
+  --gpio: inout std_logic_vector(47 downto 0);
+  --hdmi_sda: inout std_logic;
+  --hdmi_scl: out std_logic;
+  --hdmi_hec: out std_logic;
   hdmi_d: out std_logic_vector(2 downto 0);
   hdmi_clk: out std_logic;
+  --hdmi_cec: inout std_logic;
   btn_left, btn_right: in std_logic
 );
 end;
@@ -26,13 +28,13 @@ architecture struct of hdmiaudio_tb276 is
   signal S_vga_vsync, S_vga_hsync: std_logic;
   signal S_vga_vblank, S_vga_blank: std_logic;
   signal S_audio: std_logic_vector(11 downto 0);
-
+  
   signal reset        : std_logic;
   signal clock_stable : std_logic;
   signal dip_switch   : std_logic_vector(7 downto 0) := (others => '0');
   -- alias  audio_select : std_logic_vector(2 downto 0) is sw(10 downto 8);
 begin
-  clkgen: entity work.pll_25M_250M_25M
+  clkgen: entity work.clk_25M_125M_25M
   port map(
       inclk0 => clk_25m, c0 => clk_pixel_shift, c1 => clk_pixel,
       locked => clock_stable
@@ -63,11 +65,11 @@ begin
   );
 
   -- some debugging with LEDs
-  led(0) <= not gpio(0);
-  led(1) <= (not gpio(1)) or (not gpio(2));
-  led(2) <= not gpio(3);
-  led(3) <= not gpio(4);
-  led(4) <= (not gpio(5)) or (not gpio(6));
+  led(0) <= btn_left;
+  led(1) <= btn_right;
+  --led(2) <= not gpio(3);
+  --led(3) <= not gpio(4);
+  --led(4) <= (not gpio(5)) or (not gpio(6));
   led(5) <= S_vga_r(1); -- when game works, changing color on
   led(6) <= S_vga_g(1); -- large area of the screen should
   led(7) <= S_vga_b(1); -- also be "visible" on RGB indicator LEDs
@@ -94,7 +96,5 @@ begin
     O_TMDS_D2      => HDMI_D(2),
     O_TMDS_CLK     => HDMI_CLK
   );
-
-  gpio(31 downto 20) <= S_audio;
 
 end struct;
