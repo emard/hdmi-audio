@@ -20,11 +20,11 @@ entity av_hdmi is
 generic
 (
         C_GENERIC_SERIALIZER: BOOLEAN := FALSE; -- set to true for vendor-independent serializer
-	FREQ: integer := 27000000;		-- pixel clock frequency
-	FS: integer := 48000;			-- audio sample rate - should be 32000, 41000 or 48000
-	CTS: integer := 27000;			-- CTS = Freq(pixclk) * N / (128 * Fs)
-	N: integer := 6144				-- N = 128 * Fs /1000,  128 * Fs /1500 <= N <= 128 * Fs /300
-											-- Check HDMI spec 7.2 for details
+	FREQ: integer := 27000000;              -- pixel clock frequency
+	FS: integer := 48000;                   -- audio sample rate - should be 32000, 41000 or 48000
+	CTS: integer := 27000;                  -- CTS = Freq(pixclk) * N / (128 * Fs)
+	N: integer := 6144                      -- N = 128 * Fs /1000,  128 * Fs /1500 <= N <= 128 * Fs /300
+					        -- Check HDMI spec 7.2 for details
 );
 port (
 	-- clocks
@@ -86,7 +86,7 @@ end component;
 	
 	
 	signal tx_in	: std_logic_vector(29 downto 0);
-	signal tmds_d	: std_logic_vector(2 downto 0);
+	signal tmds_d	: std_logic_vector(3 downto 0);
 
 	signal data     : std_logic;
 	signal dataPacket0		: std_logic_vector(3 downto 0);	
@@ -351,12 +351,16 @@ tx_in <= red(0) & red(1) & red(2) & red(3) & red(4) & red(5) & red(6) & red(7) &
 
 G_vendor_specific_serializer:
 if not C_GENERIC_SERIALIZER generate
-vendor_serializer_inst: entity work.serializer
-PORT MAP (
+  vendor_serializer_inst: entity work.serializer
+  PORT MAP (
 	tx_in	 	=> tx_in,
 	tx_inclock	=> I_CLK_PIXEL_x5,
 	tx_syncclock	=> I_CLK_PIXEL,
-	tx_out	 	=> tmds_d);
+	tx_out	 	=> tmds_d(2 downto 0));
+  O_TMDS_D0  <= tmds_d(0);
+  O_TMDS_D1  <= tmds_d(1);
+  O_TMDS_D2  <= tmds_d(2);
+  O_TMDS_CLK <= I_CLK_PIXEL;
 end generate;
 
 G_vendor_independent_serializer:
@@ -367,11 +371,10 @@ PORT MAP (
 	tx_inclock	=> I_CLK_PIXEL_x5, -- actually 10x I_CLK_PIXEL
 	tx_syncclock	=> I_CLK_PIXEL,
 	tx_out	 	=> tmds_d);
+  O_TMDS_D0  <= tmds_d(0);
+  O_TMDS_D1  <= tmds_d(1);
+  O_TMDS_D2  <= tmds_d(2);
+  O_TMDS_CLK <= tmds_d(3);
 end generate;
-
-O_TMDS_D0	 <= tmds_d(0);
-O_TMDS_D1	 <= tmds_d(1);
-O_TMDS_D2	 <= tmds_d(2);
-O_TMDS_CLK <= I_CLK_PIXEL;
 
 end rtl;
