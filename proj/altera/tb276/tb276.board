@@ -85,22 +85,26 @@ set_location_assignment PIN_75  -to gpio[47]
 # we define in on J4 connector (routed differential)
 # hecp = HPD (hotplug detect input)
 
-# GPIO HDMI
-#set_location_assignment PIN_121 -to "hdmi_hecn"
-#set_location_assignment PIN_120 -to "hdmi_hecp"
+# GPIO HDMI works wired directly to connector.
+# pins should be set to "3.3-V LVCMOS" I/O standard
+# No transcievers or resistors necessary.
+#set_location_assignment PIN_121 -to "hdmi_clkp"
+#set_location_assignment PIN_120 -to "hdmi_clkn"
 #set_location_assignment PIN_125 -to "hdmi_sda"
 #set_location_assignment PIN_124 -to "hdmi_scl"
-#set_location_assignment PIN_127 -to "hdmi_clkn"
-#set_location_assignment PIN_126 -to "hdmi_clkp"
-#set_location_assignment PIN_129 -to "hdmi_dn[0]"
-#set_location_assignment PIN_128 -to "hdmi_dp[0]"
-#set_location_assignment PIN_133 -to "hdmi_dn[1]"
-#set_location_assignment PIN_132 -to "hdmi_dp[1]"
-#set_location_assignment PIN_136 -to "hdmi_dn[2]"
-#set_location_assignment PIN_135 -to "hdmi_dp[2]"
+#set_location_assignment PIN_127 -to "hdmi_dp[0]"
+#set_location_assignment PIN_126 -to "hdmi_dn[0]"
+#set_location_assignment PIN_129 -to "hdmi_dp[1]"
+#set_location_assignment PIN_128 -to "hdmi_dn[1]"
+#set_location_assignment PIN_133 -to "hdmi_dp[2]"
+#set_location_assignment PIN_132 -to "hdmi_dn[2]"
+#set_location_assignment PIN_136 -to "hdmi_hecp"
+#set_location_assignment PIN_135 -to "hdmi_hecn"
 #set_location_assignment PIN_137 -to "hdmi_cec"
 
-# Differential HDMI
+# Differential HDMI works wired directly to connector.
+# pins should be set to "MINI-LVDS_E_3R" I/O standard
+# No transcievers or resistors necessary.
 set_location_assignment PIN_121 -to "hdmi_clk"
 set_location_assignment PIN_120 -to "hdmi_clk(n)"
 set_location_assignment PIN_125 -to "hdmi_sda"
@@ -116,12 +120,8 @@ set_location_assignment PIN_135 -to "hdmi_hec(n)"
 set_location_assignment PIN_137 -to "hdmi_cec"
 
 
-# rs232 is not on tb276 board
-# we define it on J3 connector
-# pinout for usbserial-TTL3V3 FTDI adapter
-# the 433.92 MHz antenna pin
-#set_location_assignment PIN_75 -to ant_433M92
 set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to clk_25m
+
 # Warning: led[4:0] are connected to I/O bank 8.
 # Because MINI-LVDS_E_3R is enabled at I/O bank 7 and 8 for HDMI,
 # LED I/O standard can't be 3.3V (it can be 2.5V).
