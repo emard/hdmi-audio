@@ -35,8 +35,8 @@ architecture struct of hdmiaudio_tb276 is
   
   signal reset        : std_logic;
   signal clock_stable : std_logic;
-  signal dip_switch   : std_logic_vector(7 downto 0) := (others => '0');
-  -- alias  audio_select : std_logic_vector(2 downto 0) is sw(10 downto 8);
+  signal R_pixel_blink: std_logic_vector(25 downto 0) := (others => '0');
+  signal R_pixel_shift_blink: std_logic_vector(27 downto 0) := (others => '0');
 begin
   G_vendorspec_hdmi:
   if not C_generic_hdmi generate
@@ -63,7 +63,7 @@ begin
   port map
   (
       clk_pixel => clk_pixel,
-      test_picture => '1', -- shows test picture when VGA is disabled (on startup)
+      test_picture => btn_left, -- shows test picture when VGA is disabled (on startup)
       fetch_next => open,
       line_repeat => open,
       red_byte    => (others => '0'), -- framebuffer inputs not used
@@ -83,15 +83,32 @@ begin
   -- some debugging with LEDs
   led(0) <= btn_left;
   led(1) <= btn_right;
-  --led(2) <= not gpio(3);
-  --led(3) <= not gpio(4);
-  --led(4) <= (not gpio(5)) or (not gpio(6));
-  led(5) <= S_vga_r(1); -- when game works, changing color on
-  led(6) <= S_vga_g(1); -- large area of the screen should
-  led(7) <= S_vga_b(1); -- also be "visible" on RGB indicator LEDs
+  --led(0) <= R_pixel_blink(R_pixel_blink'high);
+  --led(1) <= R_pixel_shift_blink(R_pixel_shift_blink'high);
+  led(2) <= S_vga_blank;
+  led(3) <= S_vga_hsync;
+  led(4) <= S_vga_vsync;
+  led(5) <= S_vga_r(7); -- when game works, changing color on
+  led(6) <= S_vga_g(7); -- large area of the screen should
+  led(7) <= S_vga_b(7); -- also be "visible" on RGB indicator LEDs
+
+  process(clk_pixel)
+  begin
+    if rising_edge(clk_pixel) then
+      R_pixel_blink <= R_pixel_blink+1;
+    end if;
+  end process;
+
+  process(clk_pixel_shift)
+  begin
+    if rising_edge(clk_pixel_shift) then
+      R_pixel_shift_blink <= R_pixel_shift_blink+1;
+    end if;
+  end process;
   
+
   -- buzz generator from vblank
-  S_audio(11) <= S_vga_vblank;
+  S_audio(11) <= S_vga_vblank and btn_right;
 
   -- HDMI
   hdmi_out: entity work.av_hdmi
@@ -111,8 +128,8 @@ begin
     I_G	           => S_vga_g,
     I_B            => S_vga_b,
     I_BLANK        => S_vga_blank,
-    I_HSYNC        => S_vga_hsync,
-    I_VSYNC        => S_vga_vsync,
+    I_HSYNC        => not S_vga_hsync,
+    I_VSYNC        => not S_vga_vsync,
     I_AUDIO_PCM_L  => S_audio & "0000",
     I_AUDIO_PCM_R  => S_audio & "0000",
     O_TMDS_D0      => HDMI_D(0),

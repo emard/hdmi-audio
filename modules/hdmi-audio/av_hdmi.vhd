@@ -21,7 +21,7 @@ generic
 (
         C_GENERIC_SERIALIZER: BOOLEAN := FALSE; -- set to true for vendor-independent serializer
 	FREQ: integer := 27000000;              -- pixel clock frequency
-	FS: integer := 48000;                   -- audio sample rate - should be 32000, 41000 or 48000
+	FS: integer := 48000;                   -- audio sample rate - should be 32000, 44100 or 48000
 	CTS: integer := 27000;                  -- CTS = Freq(pixclk) * N / (128 * Fs)
 	N: integer := 6144                      -- N = 128 * Fs /1000,  128 * Fs /1500 <= N <= 128 * Fs /300
 					        -- Check HDMI spec 7.2 for details
@@ -55,10 +55,10 @@ architecture rtl of av_hdmi is
 component hdmidataencoder
 generic
 (
-	FREQ: integer := 27000000;
-	FS: integer := 48000;
-	CTS: integer := 27000;
-	N: integer := 6144
+	FREQ: integer := FREQ;
+	FS: integer := FS;
+	CTS: integer := CTS;
+	N: integer := N
 );
 port (
 	i_pixclk	: in std_logic;
