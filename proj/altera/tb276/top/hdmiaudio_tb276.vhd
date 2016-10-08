@@ -37,6 +37,7 @@ architecture struct of hdmiaudio_tb276 is
   signal clock_stable : std_logic;
   signal R_pixel_blink: std_logic_vector(25 downto 0) := (others => '0');
   signal R_pixel_shift_blink: std_logic_vector(27 downto 0) := (others => '0');
+  signal R_beep: std_logic_vector(14 downto 0);
 begin
   G_vendorspec_hdmi:
   if not C_generic_hdmi generate
@@ -63,7 +64,7 @@ begin
   port map
   (
       clk_pixel => clk_pixel,
-      test_picture => btn_left, -- shows test picture when VGA is disabled (on startup)
+      test_picture => '1', -- shows test picture when VGA is disabled (on startup)
       fetch_next => open,
       line_repeat => open,
       red_byte    => (others => '0'), -- framebuffer inputs not used
@@ -106,9 +107,16 @@ begin
     end if;
   end process;
   
-
-  -- buzz generator from vblank
-  S_audio(11) <= S_vga_vblank and btn_right;
+  -- beep generator (sawtooth)
+  process(clk_pixel)
+  begin
+    if rising_edge(clk_pixel) then
+      R_beep <= R_beep+1;
+    end if;
+  end process;
+  -- press left button to mute the beep sound
+  S_audio <= R_beep(R_beep'high downto R_beep'high-11) when btn_left='1' 
+             else (others => '0');
 
   -- HDMI
   hdmi_out: entity work.av_hdmi
@@ -130,6 +138,7 @@ begin
     I_BLANK        => S_vga_blank,
     I_HSYNC        => not S_vga_hsync,
     I_VSYNC        => not S_vga_vsync,
+    I_AUDIO_ENABLE => btn_right, -- press right button to disable audio (generate only video)
     I_AUDIO_PCM_L  => S_audio & "0000",
     I_AUDIO_PCM_R  => S_audio & "0000",
     O_TMDS_D0      => HDMI_D(0),

@@ -15,6 +15,7 @@ module hdmidataencoder
 	input 			i_hSync,
 	input 			i_vSync,
 	input 			i_blank,
+	input i_audio_enable,
 	input [15:0] 	i_audioL,
 	input [15:0] 	i_audioR,	
 	output [3:0] 	o_d0,
@@ -253,7 +254,7 @@ begin
 	AudioGen();
 
 	// Send 2 packets each line
-	if(allowGeneration) begin
+	if(allowGeneration & i_audio_enable) begin
 		SendPackets(tercData);
 	end else begin
 		tercData<=0;

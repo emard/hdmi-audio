@@ -39,7 +39,8 @@ port (
 	I_HSYNC			: in std_logic;
 	I_VSYNC			: in std_logic;
 	
-	-- PCM audio 
+	-- PCM audio
+	I_AUDIO_ENABLE  : in std_logic;
 	I_AUDIO_PCM_L 	: in std_logic_vector(15 downto 0);
 	I_AUDIO_PCM_R	: in std_logic_vector(15 downto 0);
 	
@@ -65,6 +66,7 @@ port (
 	i_hSync		: in std_logic;
 	i_vSync		: in std_logic;
 	i_blank		: in std_logic;
+	i_audio_enable  : in std_logic;
 	i_audioL		: in std_logic_vector(15 downto 0);
 	i_audioR		: in std_logic_vector(15 downto 0);
 	
@@ -306,6 +308,7 @@ port map(
 	i_blank 		=> I_BLANK,
 	i_hSync		=> I_HSYNC,
 	i_vSync		=> I_VSYNC,
+	i_audio_enable  => I_AUDIO_ENABLE,
 	i_audioL		=>	I_AUDIO_PCM_L,
 	i_audioR		=>	I_AUDIO_PCM_R,
 	o_d0 			=> dataPacket0,
