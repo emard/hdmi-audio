@@ -8,7 +8,7 @@ use ieee.numeric_std.all;
 entity hdmiaudio_tb276 is
 generic
 (
-  C_generic_hdmi: boolean := false
+  C_generic_hdmi: boolean := true
 );
 port
 (
@@ -138,7 +138,7 @@ begin
     I_BLANK        => S_vga_blank,
     I_HSYNC        => not S_vga_hsync,
     I_VSYNC        => not S_vga_vsync,
-    I_AUDIO_ENABLE => btn_right, -- press right button to disable audio (generate only video)
+    I_AUDIO_ENABLE => not btn_right, -- press right button to enable audio
     I_AUDIO_PCM_L  => S_audio & "0000",
     I_AUDIO_PCM_R  => S_audio & "0000",
     O_TMDS_D0      => HDMI_D(0),

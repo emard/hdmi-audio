@@ -41,7 +41,7 @@ BEGIN
     S_channel_latch(i) <= R_tx_latch(C_channel_bits*(i+1)-1 downto C_channel_bits*i);
   end generate;
 
-  S_channel_latch(3) <= "0000011111"; -- the clock pattern
+  S_channel_latch(3) <= "1111100000"; -- the clock pattern
 
   -- clock edge detection
   process(tx_inclock) -- pixel shift clock
