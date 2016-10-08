@@ -11,6 +11,13 @@
 -- N=0x1000 CTS=0x6978 (27MHz pixel clock -> 32KHz audio clock)
 -- N=0x1800 CTS=0x6978 (27MHz pixel clock -> 48KHz audio clock)
 ---------------------------------------------------------------------------
+-- Some monitors (DVI) will not show the picture from mixed HDMI audio+video
+-- signal. Such monitors can only show picture when I_AUDIO_ENABLE='0'
+-- I2C DDC (EDID) parsing with a state machine or CPU
+-- is required to detect display capabilities.
+-- see EDID and CEA-861
+- -http://www.extron.com/company/article.aspx?id=uedid
+---------------------------------------------------------------------------
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -39,6 +46,7 @@ port (
 	I_VSYNC			: in std_logic;
 	
 	-- PCM audio 
+        I_AUDIO_ENABLE          : in std_logic;
 	I_AUDIO_PCM_L 		: in std_logic_vector(15 downto 0);
 	I_AUDIO_PCM_R		: in std_logic_vector(15 downto 0);
 	
