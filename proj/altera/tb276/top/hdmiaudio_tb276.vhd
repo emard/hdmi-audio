@@ -8,7 +8,7 @@ use ieee.numeric_std.all;
 entity hdmiaudio_tb276 is
 generic
 (
-  C_generic_hdmi: boolean := true
+  C_generic_hdmi: boolean := false
 );
 port
 (
