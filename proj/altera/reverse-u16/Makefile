@@ -38,6 +38,8 @@ SRCS = \
 top/hdmiaudio_reverseu16.vhd \
 clocks/pll_50M_250M_25M_83M333.vhd \
 ../../../modules/video-generator/vga.vhd \
+../../../modules/osd/osd.vhd \
+../../../modules/osd/char_rom.v \
 ../../../modules/hdmi-audio/av_hdmi.vhd \
 ../../../modules/hdmi-audio/hdmidataencoder.v \
 ../../../modules/hdmi-audio/encoder.vhd \
