@@ -8,6 +8,7 @@ use ieee.numeric_std.all;
 entity hdmiaudio_reverseu16 is
 generic
 (
+  C_audio_islands: boolean := true;
   C_generic_hdmi: boolean := true
 );
 port
@@ -25,20 +26,27 @@ port
 end;
 
 architecture struct of hdmiaudio_reverseu16 is
+  constant C_resolution_x: integer := 640;
   signal clk_pixel, clk_pixel_shift: std_logic;
- 
+
   signal S_vga_r, S_vga_g, S_vga_b: std_logic_vector(7 downto 0);
   signal S_vga_vsync, S_vga_hsync: std_logic;
   signal S_vga_vblank, S_vga_blank: std_logic;
   signal S_audio: std_logic_vector(11 downto 0);
+  signal S_audio_enable: std_logic;
 
   signal hdmi_d: std_logic_vector(2 downto 0);
   signal hdmi_clk: std_logic;
 
   signal reset        : std_logic;
   signal clock_stable : std_logic;
+
   signal R_pixel_blink: std_logic_vector(25 downto 0) := (others => '0');
-  signal R_pixel_shift_blink: std_logic_vector(27 downto 0) := (others => '0');
+  signal R_pixel_shift_blink: std_logic_vector(28 downto 0) := (others => '0');
+  signal S_vga_fetch_next: std_logic;
+  signal S_osd_pixel: std_logic;
+  signal S_osd_green: std_logic_vector(7 downto 0); -- OSD byte signal
+
   signal R_beep: std_logic_vector(14 downto 0);
 begin
   G_vendorspec_hdmi:
@@ -67,14 +75,13 @@ begin
   vgabitmap: entity work.vga
   generic map -- workaround for wrong video size
   (
-    C_resolution_x => 640,
-    C_hsync_front_porch => 18
+    C_resolution_x => C_resolution_x
   )
   port map
   (
       clk_pixel => clk_pixel,
       test_picture => '1', -- shows test picture when VGA is disabled (on startup)
-      fetch_next => open,
+      fetch_next => S_vga_fetch_next,
       line_repeat => open,
       red_byte    => (others => '0'), -- framebuffer inputs not used
       green_byte  => (others => '0'), -- rgb signal is synchronously generated
@@ -90,6 +97,23 @@ begin
       vga_vblank => S_vga_vblank -- '1' when outside of vertical graphics area (used for vblank interrupt)
   );
 
+  -- OSD overlay for the green channel
+  I_osd: entity work.osd
+  generic map -- workaround for wrong video size
+  (
+    C_resolution_x => C_resolution_x
+  )
+  port map
+  (
+      clk_pixel => clk_pixel,
+      vsync => S_vga_vsync,
+      fetch_next => S_vga_fetch_next,
+      probe_in(63 downto 48) => R_pixel_shift_blink(R_pixel_shift_blink'high downto R_pixel_shift_blink'high-15),
+      probe_in(15 downto 0) => R_pixel_blink(R_pixel_blink'high downto R_pixel_blink'high-15),
+      osd_out => S_osd_pixel
+  );
+  S_osd_green <= (others => S_osd_pixel);
+
   process(clk_pixel)
   begin
     if rising_edge(clk_pixel) then
@@ -103,7 +127,7 @@ begin
       R_pixel_shift_blink <= R_pixel_shift_blink+1;
     end if;
   end process;
-  
+
   -- beep generator (sawtooth)
   process(clk_pixel)
   begin
@@ -112,9 +136,10 @@ begin
     end if;
   end process;
   -- press left button to mute the beep sound
-  S_audio <= R_beep(R_beep'high downto R_beep'high-11) when true 
+  S_audio <= R_beep(R_beep'high downto R_beep'high-11) when true
              else (others => '0');
 
+  S_audio_enable <= '1' when C_audio_islands else '0';
   -- HDMI
   hdmi_out: entity work.av_hdmi
   generic map
@@ -130,12 +155,12 @@ begin
     I_CLK_PIXEL_x5 => clk_pixel_shift,
     I_CLK_PIXEL    => clk_pixel,
     I_R            => S_vga_r,
-    I_G	           => S_vga_g,
+    I_G	           => S_vga_g or S_osd_green,
     I_B            => S_vga_b,
     I_BLANK        => S_vga_blank,
     I_HSYNC        => not S_vga_hsync,
     I_VSYNC        => not S_vga_vsync,
-    I_AUDIO_ENABLE => '0', -- press right button to enable audio
+    I_AUDIO_ENABLE => S_audio_enable, -- '1' to enable audio islands
     I_AUDIO_PCM_L  => S_audio & "0000",
     I_AUDIO_PCM_R  => S_audio & "0000",
     O_TMDS_D0      => HDMI_D(0),
@@ -143,7 +168,7 @@ begin
     O_TMDS_D2      => HDMI_D(2),
     O_TMDS_CLK     => HDMI_CLK
   );
-  
+
   hdmi_clkp <= hdmi_clk;
   hdmi_clkn <= not hdmi_clk;
   hdmi_dp <= hdmi_d;
