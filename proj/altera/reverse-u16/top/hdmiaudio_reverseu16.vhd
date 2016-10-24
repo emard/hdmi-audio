@@ -9,19 +9,23 @@ entity hdmiaudio_reverseu16 is
 generic
 (
   C_audio_islands: boolean := true;
-  C_generic_hdmi: boolean := true
+  C_generic_hdmi: boolean := false
 );
 port
 (
   clk_50MHz: in std_logic;
+  -- HDMI
   --hdmi_sda: inout std_logic;
   --hdmi_scl: out std_logic;
   --hdmi_hec: out std_logic;
   --hdmi_cec: inout std_logic;
-  --hdmi_d: out std_logic_vector(2 downto 0);
-  --hdmi_clk: out std_logic
-  hdmi_dp, hdmi_dn: out std_logic_vector(2 downto 0);
-  hdmi_clkp, hdmi_clkn: out std_logic
+
+  -- for vendor-specific serializer
+  hdmi_d0, hdmi_d1, hdmi_d2: out std_logic;
+  hdmi_clk: out std_logic
+  -- for generic serializer
+  --hdmi_dp, hdmi_dn: out std_logic_vector(2 downto 0);
+  --hdmi_clkp, hdmi_clkn: out std_logic
 );
 end;
 
@@ -35,8 +39,8 @@ architecture struct of hdmiaudio_reverseu16 is
   signal S_audio: std_logic_vector(11 downto 0);
   signal S_audio_enable: std_logic;
 
-  signal hdmi_d: std_logic_vector(2 downto 0);
-  signal hdmi_clk: std_logic;
+  signal S_hdmi_d0, S_hdmi_d1, S_hdmi_d2: std_logic;
+  signal S_hdmi_clk: std_logic;
 
   signal reset        : std_logic;
   signal clock_stable : std_logic;
@@ -51,22 +55,32 @@ architecture struct of hdmiaudio_reverseu16 is
 begin
   G_vendorspec_hdmi:
   if not C_generic_hdmi generate
-  --clkgen_125_25: entity work.clk_25M_125M_25M
-  --port map(
-  --    inclk0 => clk_50MHz, c0 => clk_pixel_shift, c1 => clk_pixel,
-  --    locked => clock_stable
-  --);
+    clkgen_125_25: entity work.clk_50M_125M_25M
+    port map(
+      inclk0 => clk_50MHz,   --  50 MHz input from board
+      c0 => clk_pixel_shift, -- 125 MHz
+      c1 => clk_pixel,       --  25 MHz
+      locked => clock_stable
+    );
+    hdmi_clk <= S_hdmi_clk;
+    hdmi_d0  <= S_hdmi_d0;
+    hdmi_d1  <= S_hdmi_d1;
+    hdmi_d2  <= S_hdmi_d2;
   end generate;
 
   G_generic_hdmi:
   if C_generic_hdmi generate
-    clkgen: entity work.pll_50M_250M_25M_83M333
+    clkgen_250_25: entity work.pll_50M_250M_25M_83M333
     port map(
       inclk0 => clk_50MHz,    --  50 MHz input from board
       c0 => clk_pixel_shift,  -- 250 MHz
       c1 => clk_pixel,        --  25 MHz
       c2 => open              --  83.333 MHz
     );
+    --hdmi_clkp <=      S_hdmi_clk;
+    --hdmi_clkn <= not  S_hdmi_clk;
+    --hdmi_dp   <=     (S_hdmi_d2 & S_hdmi_d1 & S_hdmi_d0);
+    --hdmi_dn   <= not (S_hdmi_d2 & S_hdmi_d1 & S_hdmi_d0);
   end generate;
 
   reset <= not clock_stable;
@@ -163,15 +177,10 @@ begin
     I_AUDIO_ENABLE => S_audio_enable, -- '1' to enable audio islands
     I_AUDIO_PCM_L  => S_audio & "0000",
     I_AUDIO_PCM_R  => S_audio & "0000",
-    O_TMDS_D0      => HDMI_D(0),
-    O_TMDS_D1      => HDMI_D(1),
-    O_TMDS_D2      => HDMI_D(2),
-    O_TMDS_CLK     => HDMI_CLK
+    O_TMDS_D0      => S_HDMI_D0,
+    O_TMDS_D1      => S_HDMI_D1,
+    O_TMDS_D2      => S_HDMI_D2,
+    O_TMDS_CLK     => S_HDMI_CLK
   );
-
-  hdmi_clkp <= hdmi_clk;
-  hdmi_clkn <= not hdmi_clk;
-  hdmi_dp <= hdmi_d;
-  hdmi_dn <= not hdmi_d;
 
 end struct;
