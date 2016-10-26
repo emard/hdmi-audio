@@ -44,8 +44,8 @@ clocks/clk_50M_125M_25M.vhd \
 ../../../modules/hdmi-audio/av_hdmi.vhd \
 ../../../modules/hdmi-audio/hdmidataencoder.v \
 ../../../modules/hdmi-audio/encoder.vhd \
-../../../modules/hdmi-audio/altera/cyclone4/serializer.vhd \
 ../../../modules/hdmi-audio/hdmidelay.vhd \
 ../../../modules/hdmi-audio/serializer_generic.vhd \
+../../../modules/hdmi-audio/altera/cyclone4/serializer.vhd \
 ../../../modules/vnc2hid/uart_deserializer.vhd \
 ../../../modules/vnc2hid/vnc2hid.vhd

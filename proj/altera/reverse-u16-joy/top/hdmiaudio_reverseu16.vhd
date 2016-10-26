@@ -9,7 +9,7 @@ entity hdmiaudio_reverseu16 is
 generic
 (
   C_audio_islands: boolean := false;
-  C_generic_hdmi: boolean := false
+  C_hdmi_generic_serializer: boolean := false
 );
 port
 (
@@ -45,8 +45,11 @@ architecture struct of hdmiaudio_reverseu16 is
   signal S_audio: std_logic_vector(11 downto 0);
   signal S_audio_enable: std_logic;
 
+  signal S_hdmi_pd0, S_hdmi_pd1, S_hdmi_pd2: std_logic_vector(9 downto 0);
   signal S_hdmi_d0, S_hdmi_d1, S_hdmi_d2: std_logic;
   signal S_hdmi_clk: std_logic;
+  signal S_hdmi_bits: std_logic_vector(29 downto 0);
+  signal tmds_d: std_logic_vector(3 downto 0);
 
   signal reset        : std_logic;
   signal clock_stable : std_logic;
@@ -63,7 +66,7 @@ architecture struct of hdmiaudio_reverseu16 is
   signal R_beep: std_logic_vector(14 downto 0);
 begin
   G_vendorspec_hdmi:
-  if not C_generic_hdmi generate
+  if not C_hdmi_generic_serializer generate
     clkgen_125_25: entity work.clk_50M_125M_25M
     port map
     (
@@ -78,8 +81,8 @@ begin
     hdmi_d2  <= S_hdmi_d2;
   end generate;
 
-  G_generic_hdmi:
-  if C_generic_hdmi generate
+  G_generic_serializer:
+  if C_hdmi_generic_serializer generate
     clkgen_250_25: entity work.pll_50M_250M_25M_83M333
     port map
     (
@@ -171,7 +174,6 @@ begin
   hdmi_out: entity work.av_hdmi
   generic map
   (
-    C_generic_serializer => C_generic_hdmi,
     FREQ => 25000000,
     FS => 48000,
     CTS => 25000,
@@ -179,7 +181,6 @@ begin
   )
   port map
   (
-    I_CLK_PIXEL_x5 => clk_pixel_shift,
     I_CLK_PIXEL    => clk_pixel,
     I_R            => S_vga_r,
     I_G	           => S_vga_g or S_osd_green,
@@ -190,12 +191,44 @@ begin
     I_AUDIO_ENABLE => S_audio_enable, -- '1' to enable audio islands
     I_AUDIO_PCM_L  => S_audio & "0000",
     I_AUDIO_PCM_R  => S_audio & "0000",
-    O_TMDS_D0      => S_HDMI_D0,
-    O_TMDS_D1      => S_HDMI_D1,
-    O_TMDS_D2      => S_HDMI_D2,
-    O_TMDS_CLK     => S_HDMI_CLK
+    O_TMDS_PD0      => S_HDMI_PD0,
+    O_TMDS_PD1      => S_HDMI_PD1,
+    O_TMDS_PD2      => S_HDMI_PD2
   );
-  
+
+  -- S_hdmi_bits <= S_HDMI_PD2 & S_HDMI_PD1 & S_HDMI_PD0; -- this would be normal bit order, but
+  -- generic serializer follows vendor specific serializer style
+  S_hdmi_bits <=  S_HDMI_PD2(0) & S_HDMI_PD2(1) & S_HDMI_PD2(2) & S_HDMI_PD2(3) & S_HDMI_PD2(4) & S_HDMI_PD2(5) & S_HDMI_PD2(6) & S_HDMI_PD2(7) & S_HDMI_PD2(8) & S_HDMI_PD2(9) &
+                  S_HDMI_PD1(0) & S_HDMI_PD1(1) & S_HDMI_PD1(2) & S_HDMI_PD1(3) & S_HDMI_PD1(4) & S_HDMI_PD1(5) & S_HDMI_PD1(6) & S_HDMI_PD1(7) & S_HDMI_PD1(8) & S_HDMI_PD1(9) &
+                  S_HDMI_PD0(0) & S_HDMI_PD0(1) & S_HDMI_PD0(2) & S_HDMI_PD0(3) & S_HDMI_PD0(4) & S_HDMI_PD0(5) & S_HDMI_PD0(6) & S_HDMI_PD0(7) & S_HDMI_PD0(8) & S_HDMI_PD0(9);
+
+  --G_generic_serializer: if C_hdmi_generic_serializer generate
+  --  generic_serializer_inst: entity work.serializer_generic
+  --  PORT MAP
+  --  (
+  --      tx_in => S_hdmi_bits,
+  --      tx_inclock => CLK_PIXEL_SHIFT, -- NOTE: generic serializer needs CLK_PIXEL x10
+  --      tx_syncclock => CLK_PIXEL,
+  --      tx_out => tmds_d
+  --  );
+  --  hdmi_clk <= tmds_d(3);
+  --  hdmi_d   <= tmds_d(2 downto 0);
+  --end generate;
+  G_vendor_specific_serializer: if not C_hdmi_generic_serializer generate
+    generic_serializer_inst: entity work.serializer
+    PORT MAP
+    (
+        tx_in => S_hdmi_bits,
+        tx_inclock => CLK_PIXEL_SHIFT, -- NOTE: vendor-specific serializer needs CLK_PIXEL x5
+        tx_syncclock => CLK_PIXEL,
+        tx_out => tmds_d(2 downto 0)
+    );
+    S_hdmi_clk  <= CLK_PIXEL;
+    S_hdmi_d0   <= tmds_d(0);
+    S_hdmi_d1   <= tmds_d(1);
+    S_hdmi_d2   <= tmds_d(2);
+  end generate;
+
   -- the user input device
   hid: entity work.vnc2hid
   generic map
