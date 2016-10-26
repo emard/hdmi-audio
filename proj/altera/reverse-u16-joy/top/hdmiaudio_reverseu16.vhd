@@ -17,7 +17,8 @@ port
 
   -- USB
   usb_reset_n, usb_tx: in std_logic;
-  usb_si: in std_logic; -- USB_NEWFRAME
+  usb_si: in std_logic; -- USB_NEWFRAME for atari800
+  usb_io1: in std_logic; -- USB_NEWFRAME for nes
   usb_cs_n: out std_logic; -- USB_VNC_MODE_N
 
   -- HDMI
@@ -56,6 +57,8 @@ architecture struct of hdmiaudio_reverseu16 is
 
   signal JOY1: std_logic_vector(4 downto 0);
   signal JOY2: std_logic_vector(4 downto 0);
+
+  signal joy_report: std_logic_vector(71 downto 0);
 
   signal R_pixel_blink: std_logic_vector(25 downto 0) := (others => '0');
   signal R_pixel_shift_blink: std_logic_vector(28 downto 0) := (others => '0');
@@ -136,10 +139,11 @@ begin
     clk_pixel => clk_pixel,
     vsync => S_vga_vsync,
     fetch_next => S_vga_fetch_next,
-    probe_in(63 downto 48) => R_pixel_shift_blink(R_pixel_shift_blink'high downto R_pixel_shift_blink'high-15),
-    probe_in(29 downto 25) => Joy2,
-    probe_in(24 downto 20) => Joy1,
-    probe_in(15 downto 0) => R_pixel_blink(R_pixel_blink'high downto R_pixel_blink'high-15),
+    --probe_in(63 downto 48) => R_pixel_shift_blink(R_pixel_shift_blink'high downto R_pixel_shift_blink'high-15),
+    --probe_in(29 downto 25) => Joy2,
+    --probe_in(24 downto 20) => Joy1,
+    --probe_in(15 downto 0) => R_pixel_blink(R_pixel_blink'high downto R_pixel_blink'high-15),
+    probe_in(63 downto 0) => joy_report(71 downto 8),
     osd_out => S_osd_pixel
   );
   S_osd_green <= (others => S_osd_pixel);
@@ -241,19 +245,9 @@ begin
     CLK => clk_pixel, 
     RESET_N => '1',
     USB_TX => USB_TX,
-    KEYBOARD_SCAN => (others => '0'),
-    KEYBOARD_RESPONSE => open,
-    CONSOL_START => open,
-    CONSOL_SELECT => open,
-    CONSOL_OPTION => open,
-    RESET_BUTTON => open,
-    FKEYS => open,
-    JOY1_n => JOY1,
-    JOY2_n => JOY2,
-    CTL_KEYS => open,
-    CTL_KEYS_PREV => OPEN,
+    joy_report => joy_report,
     NEW_VNC2_MODE_N => usb_cs_n,
-    NEW_FRAME => usb_si
+    NEW_FRAME => usb_io1
   );
 
 end struct;
