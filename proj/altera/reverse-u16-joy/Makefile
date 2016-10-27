@@ -40,7 +40,7 @@ clocks/pll_50M_250M_25M_83M333.vhd \
 clocks/clk_50M_125M_25M.vhd \
 ../../../modules/video-generator/vga.vhd \
 ../../../modules/osd/osd.vhd \
-../../../modules/osd/char_rom.v \
+../../../modules/osd/char_rom.vhd \
 ../../../modules/hdmi-audio/av_hdmi.vhd \
 ../../../modules/hdmi-audio/hdmidataencoder.v \
 ../../../modules/hdmi-audio/encoder.vhd \
