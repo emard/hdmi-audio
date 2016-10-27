@@ -58,14 +58,14 @@ reg allowGeneration;
 initial
 begin
 	audioPacketHeader=0;
-	audioSubPacket[0]=0;
-	audioSubPacket[1]=0;
-	audioSubPacket[2]=0;
-	audioSubPacket[3]=0;
+	audioSubPacket[0]<=0;
+	audioSubPacket[1]<=0;
+	audioSubPacket[2]<=0;
+	audioSubPacket[3]<=0;
 	channelStatusIdx=0;
 	audioTimer=0;
 	samplesHead=0;
-	ctsTimer = 0;
+	ctsTimer<=0;
 	dataChannel0=0;
 	dataChannel1=0;
 	dataChannel2=0;
@@ -110,7 +110,7 @@ task ECCu;
 	input passthroughData;
 	begin
 		outbit <= passthroughData?bita:code[7];
-		code <= ECCcode(code, bita, passthroughData);
+		code = ECCcode(code, bita, passthroughData);
 	end
 endtask
 
@@ -124,7 +124,7 @@ task ECC2u;
 	begin
 		outbita <= passthroughData?bita:code[7];
 		outbitb <= passthroughData?bitb:(code[6]^(((code[7]^bita) && passthroughData)?1'b1:1'b0));
-		code <= ECCcode(ECCcode(code, bita, passthroughData), bitb, passthroughData);
+		code = ECCcode(ECCcode(code, bita, passthroughData), bitb, passthroughData);
 	end
 endtask
 
@@ -144,11 +144,11 @@ begin
 	ECC2u(dataChannel1[1], dataChannel2[1], bchCode[1], pckData1[0], pckData1[1], dataOffset<28?1'b1:1'b0);
 	ECC2u(dataChannel1[2], dataChannel2[2], bchCode[2], pckData2[0], pckData2[1], dataOffset<28?1'b1:1'b0);
 	ECC2u(dataChannel1[3], dataChannel2[3], bchCode[3], pckData3[0], pckData3[1], dataOffset<28?1'b1:1'b0);
-	pckHeader<=pckHeader[23:1];
-	pckData0<=pckData0[55:2];
-	pckData1<=pckData1[55:2];
-	pckData2<=pckData2[55:2];
-	pckData3<=pckData3[55:2];
+	pckHeader=pckHeader[23:1];
+	pckData0=pckData0[55:2];
+	pckData1=pckData1[55:2];
+	pckData2=pckData2[55:2];
+	pckData3=pckData3[55:2];
 	dataOffset<=dataOffset+5'b1;
 end
 endtask
@@ -162,7 +162,7 @@ begin
 		subpacket[1]<=audioRegenPacket;
 		subpacket[2]<=audioRegenPacket;
 		subpacket[3]<=audioRegenPacket;
-		_timer <= _timer - CTS + 1;
+		_timer = _timer - CTS + 1;
 	end else begin
 		if (!oddLine) begin
 			packetHeader<=24'h0D0282;	// infoframe AVI packet	
@@ -207,8 +207,8 @@ begin
 	if (!( allowGeneration && counterX >= 32 && counterX < 64)) begin
 		if (audioTimer>=`AUDIO_TIMER_LIMIT) begin
 			audioTimer<=audioTimer-`AUDIO_TIMER_LIMIT+`AUDIO_TIMER_ADDITION;
-			audioPacketHeader<=audioPacketHeader|24'h000002|((channelStatusIdx==0?24'h100100:24'h000100)<<samplesHead);
-			audioSubPacket[samplesHead]<=((audioLAvg<<8)|(audioRAvg<<32)
+			audioPacketHeader=audioPacketHeader|24'h000002|((channelStatusIdx==0?24'h100100:24'h000100)<<samplesHead);
+			audioSubPacket[samplesHead]=((audioLAvg<<8)|(audioRAvg<<32)
 								|((^audioLAvg)?56'h08000000000000:56'h0)	// parity bit for left channel
 								|((^audioRAvg)?56'h80000000000000:56'h0))	// parity bit for right channel
 								^(channelStatus[channelStatusIdx]?56'hCC000000000000:56'h0); // And channel status bit and adjust parity
@@ -237,13 +237,13 @@ task SendPackets;
 begin
 	if (counterX<32) begin
 		// Send first data packet (Infoframe or audio clock regen)
-		dataEnable<=1;
+		dataEnable=1;
 		SendPacket(packetHeader, subpacket[0], subpacket[1], subpacket[2], subpacket[3], 1);
 	end else if (counterX<64)	begin
 		// Send second data packet (audio data)
 		SendPacket(audioPacketHeader, audioSubPacket[0], audioSubPacket[1], audioSubPacket[2], audioSubPacket[3], 0);
 	end else begin
-		dataEnable<=0;
+		dataEnable=0;
 	end
 end
 endtask
@@ -260,7 +260,7 @@ begin
 		tercData<=0;
    end 	
 
-	ctsTimer <= ctsTimer + 1;	
+	ctsTimer = ctsTimer + 1;	
 
 	if((prevBlank == 0) && (i_blank == 1)) 
 		firstHSyncChange <= 1;
