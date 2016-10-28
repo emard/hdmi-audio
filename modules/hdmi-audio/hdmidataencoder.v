@@ -66,9 +66,9 @@ begin
 	audioTimer=0;
 	samplesHead=0;
 	ctsTimer<=0;
-	dataChannel0=0;
-	dataChannel1=0;
-	dataChannel2=0;
+	dataChannel0<=0;
+	dataChannel1<=0;
+	dataChannel2<=0;
 	packetHeader=0;
 	subpacket[0]=0;
 	subpacket[1]=0;
@@ -136,9 +136,9 @@ task SendPacket;
 	inout [55:0] pckData3;
 	input firstPacket;
 begin
-	dataChannel0[0]=i_hSync;
-	dataChannel0[1]=i_vSync;
-	dataChannel0[3]=(!firstPacket || dataOffset)?1'b1:1'b0;
+	dataChannel0[0]<=i_hSync;
+	dataChannel0[1]<=i_vSync;
+	dataChannel0[3]<=(!firstPacket || dataOffset)?1'b1:1'b0;
 	ECCu(dataChannel0[2], bchHdr, pckHeader[0], dataOffset<24?1'b1:1'b0);
 	ECC2u(dataChannel1[0], dataChannel2[0], bchCode[0], pckData0[0], pckData0[1], dataOffset<28?1'b1:1'b0);
 	ECC2u(dataChannel1[1], dataChannel2[1], bchCode[1], pckData1[0], pckData1[1], dataOffset<28?1'b1:1'b0);
@@ -157,35 +157,35 @@ task InfoGen;
 	inout [16:0] _timer;
 begin
 	if (_timer >= CTS) begin
-		packetHeader<=24'h000001;	// audio clock regeneration packet
-		subpacket[0]<=audioRegenPacket;
-		subpacket[1]<=audioRegenPacket;
-		subpacket[2]<=audioRegenPacket;
-		subpacket[3]<=audioRegenPacket;
+		packetHeader=24'h000001;	// audio clock regeneration packet
+		subpacket[0]=audioRegenPacket;
+		subpacket[1]=audioRegenPacket;
+		subpacket[2]=audioRegenPacket;
+		subpacket[3]=audioRegenPacket;
 		_timer = _timer - CTS + 1;
 	end else begin
 		if (!oddLine) begin
-			packetHeader<=24'h0D0282;	// infoframe AVI packet	
+			packetHeader=24'h0D0282;	// infoframe AVI packet	
 			// Byte0: Checksum (256-(S%256))%256
 			// Byte1: 10 = 0(Y1:Y0=0 RGB)(A0=1 active format valid)(B1:B0=00 No bar info)(S1:S0=00 No scan info)
 			// Byte2: 19 = (C1:C0=0 No colorimetry)(M1:M0=1 4:3)(R3:R0=9 4:3 center)
 			// Byte3: 00 = 0(SC1:SC0=0 No scaling)
 			// Byte4: 00 = 0(VIC6:VIC0=0 custom resolution)
 			// Byte5: 00 = 0(PR5:PR0=0 No repeation)
-			subpacket[0]<=56'h00000000191046;
-			subpacket[1]<=56'h00000000000000;
+			subpacket[0]=56'h00000000191046;
+			subpacket[1]=56'h00000000000000;
 		end else begin
-			packetHeader<=24'h0A0184;	// infoframe audio packet
+			packetHeader=24'h0A0184;	// infoframe audio packet
 			// Byte0: Checksum (256-(S%256))%256
 			// Byte1: 11 = (CT3:0=1 PCM)0(CC2:0=1 2ch)
 			// Byte2: 00 = 000(SF2:0=0 As stream)(SS1:0=0 As stream)
 			// Byte3: 00 = LPCM doesn't use this
 			// Byte4-5: 00 Multichannel only (>2ch)
-			subpacket[0]<=56'h00000000001160;
-			subpacket[1]<=56'h00000000000000;
+			subpacket[0]=56'h00000000001160;
+			subpacket[1]=56'h00000000000000;
 		end
-		subpacket[2]<=56'h00000000000000;
-		subpacket[3]<=56'h00000000000000;
+		subpacket[2]=56'h00000000000000;
+		subpacket[3]=56'h00000000000000;
 	end			
 end
 endtask
@@ -257,7 +257,7 @@ begin
 	if(allowGeneration & i_audio_enable) begin
 		SendPackets(tercData);
 	end else begin
-		tercData<=0;
+		tercData=0;
    end 	
 
 	ctsTimer = ctsTimer + 1;	
