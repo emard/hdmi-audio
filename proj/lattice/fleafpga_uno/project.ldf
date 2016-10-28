@@ -15,7 +15,7 @@
         <Source name="../../../modules/osd/osd.vhd" type="VHDL" type_short="VHDL">
             <Options/>
         </Source>
-        <Source name="../../../modules/osd/char_rom.v" type="Verilog" type_short="Verilog">
+        <Source name="../../../modules/osd/char_rom.vhd" type="VHDL" type_short="VHDL">
             <Options/>
         </Source>
         <Source name="../../../modules/hdmi-audio/av_hdmi.vhd" type="VHDL" type_short="VHDL">

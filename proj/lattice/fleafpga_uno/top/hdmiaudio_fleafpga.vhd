@@ -8,6 +8,7 @@ use ieee.numeric_std.all;
 entity hdmiaudio_fleafpga is
 generic
 (
+  C_osd: boolean := true; -- lattice diamond 3.7 may fail with internal error compiling char_rom.vhd
   C_audio_islands: boolean := false;
   C_hdmi_generic_serializer: boolean := true;
   C_hdmi_ddr: boolean := true
@@ -17,10 +18,10 @@ port
   sys_clock: in std_logic; -- 25 MHz
 
   -- HDMI interface
-  LVDS_Red    : out   std_logic;
-  LVDS_Green  : out   std_logic;
-  LVDS_Blue   : out   std_logic;
-  LVDS_ck     : out   std_logic
+  LVDS_Red  : out std_logic;
+  LVDS_Green: out std_logic;
+  LVDS_Blue : out std_logic;
+  LVDS_ck   : out std_logic
 );
 end;
 
@@ -104,9 +105,11 @@ begin
   );
 
   -- OSD overlay for the green channel
+  G_bad_lattice: if C_osd generate
   I_osd: entity work.osd
   generic map -- workaround for wrong video size
   (
+    C_digits => 16,
     C_resolution_x => C_resolution_x
   )
   port map
@@ -114,14 +117,15 @@ begin
     clk_pixel => clk_pixel,
     vsync => S_vga_vsync,
     fetch_next => S_vga_fetch_next,
-    probe_in(63 downto 48) => R_pixel_shift_blink(R_pixel_shift_blink'high downto R_pixel_shift_blink'high-15),
-    --probe_in(29 downto 25) => Joy2,
-    --probe_in(24 downto 20) => Joy1,
-    probe_in(15 downto 0) => R_pixel_blink(R_pixel_blink'high downto R_pixel_blink'high-15),
-    --probe_in(63 downto 0) => joy_report(63 downto 0),
+    --probe_in(63 downto 48) => R_pixel_shift_blink(R_pixel_shift_blink'high downto R_pixel_shift_blink'high-15), -- diamond 3.7 crash
+    --probe_in(15 downto 0) => R_pixel_blink(R_pixel_blink'high downto R_pixel_blink'high-15), -- diamond 3.7 crash
+    -- probe_in(15 downto 0) => x"1234",
+    -- probe_in(31 downto 0) => x"ABCD1234",
+    probe_in(63 downto 0) => x"0123456789ABCDEF",
     osd_out => S_osd_pixel
   );
   S_osd_green <= (others => S_osd_pixel);
+  end generate;
 
   process(clk_pixel)
   begin
