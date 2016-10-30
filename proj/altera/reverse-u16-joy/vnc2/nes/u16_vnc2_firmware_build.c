@@ -423,6 +423,7 @@ void firmware(uint8 hostId, uint8 hidId)
 #ifdef DEBUG			
 							message(eol);
 #endif				
+							vos_delay_msecs(1);
 							vos_gpio_write_pin(PKGSTARTPIN, 0);
 						}
 						else
