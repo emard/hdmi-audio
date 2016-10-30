@@ -20,6 +20,10 @@ port
   usb_si: in std_logic; -- USB_NEWFRAME for atari800
   usb_io1: in std_logic; -- USB_NEWFRAME for nes
   usb_cs_n: out std_logic; -- USB_VNC_MODE_N
+  
+  -- External RS232 TTL 3.3V
+  dp: out std_logic;  -- FPGA TX to external RX
+  dn: in std_logic; -- FPGA RX to external TX
 
   -- HDMI
   --hdmi_sda: inout std_logic;
@@ -249,5 +253,6 @@ begin
     NEW_VNC2_MODE_N => usb_cs_n,
     NEW_FRAME => usb_io1
   );
+  dp <= usb_tx; -- debug serial traffic to external rs232
 
 end struct;
