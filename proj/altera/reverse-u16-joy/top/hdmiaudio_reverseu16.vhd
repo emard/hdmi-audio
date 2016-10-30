@@ -249,7 +249,7 @@ begin
     CLK => clk_pixel, 
     RESET_N => '1',
     USB_TX => USB_TX,
-    joy_report => joy_report,
+    HID_REPORT => joy_report,
     NEW_VNC2_MODE_N => usb_cs_n,
     NEW_FRAME => usb_io1
   );
