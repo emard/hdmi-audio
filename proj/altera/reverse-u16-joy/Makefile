@@ -16,10 +16,11 @@ PART = EP4CE22E22C8
 BOARDFILE = reverse-u16.board
 CONFIG_DEVICE = EPCS16
 SERIAL_FLASH_LOADER_DEVICE = EP4CE22
-OPENOCD_BOARD=reverse-u16.ocd
-# OPENOCD_INTERFACE=interface/altera-usb-blaster.cfg
+OPENOCD_BOARD=../include/reverse-u16.ocd
+OPENOCD_INTERFACE=../include/altera-usb-blaster.ocd
+#OPENOCD_INTERFACE=../include/usb-jtag.ocd
 # OPENOCD_INTERFACE=ftdi-fpu1.ocd
-OPENOCD_INTERFACE=remote.ocd
+# OPENOCD_INTERFACE=remote.ocd
 
 ###################################################################
 #

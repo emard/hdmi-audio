@@ -1,0 +1,14 @@
+#
+# Altera USB-Blaster
+#
+# http://www.altera.com/literature/ug/ug_usb_blstr.pdf
+#
+
+interface usb_blaster
+# These are already the defaults.
+# usb_blaster_vid_pid 0x09FB 0x6001
+# usb_blaster_device_desc "USB-Blaster"
+# usb_blaster_lowlevel_driver ublast2
+
+# on linux there is only ublast2 available
+# and it doesn't work, protocol gets stuck (hangs)
