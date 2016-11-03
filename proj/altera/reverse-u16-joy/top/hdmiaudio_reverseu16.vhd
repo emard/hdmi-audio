@@ -9,7 +9,7 @@ entity hdmiaudio_reverseu16 is
 generic
 (
   C_audio_islands: boolean := false;
-  C_hdmi_generic_serializer: boolean := false
+  C_hdmi_generic_serializer: boolean := true
 );
 port
 (
@@ -105,6 +105,25 @@ begin
   end generate;
 
   reset <= not clock_stable;
+
+  -- the user input device
+  hid: entity work.vnc2hid
+  generic map
+  (
+    C_clock_freq => 25000000,
+    C_baud_rate => 115200
+  )
+  port map
+  (
+    CLK => clk_pixel,
+    RESET_N => '1',
+    USB_TX => USB_TX,
+    HID_REPORT => joy_report,
+    NEW_VNC2_MODE_N => usb_cs_n,
+    NEW_FRAME => usb_io1
+  );
+  dp <= usb_tx; -- debug serial traffic to external rs232
+
 
   -- VGA video generator - pixel clock synchronous
   vgabitmap: entity work.vga
@@ -236,23 +255,5 @@ begin
     S_hdmi_d1   <= tmds_d(1);
     S_hdmi_d2   <= tmds_d(2);
   end generate;
-
-  -- the user input device
-  hid: entity work.vnc2hid
-  generic map
-  (
-    C_clock_freq => 25000000,
-    C_baud_rate => 115200
-  )
-  port map
-  (
-    CLK => clk_pixel, 
-    RESET_N => '1',
-    USB_TX => USB_TX,
-    HID_REPORT => joy_report,
-    NEW_VNC2_MODE_N => usb_cs_n,
-    NEW_FRAME => usb_io1
-  );
-  dp <= usb_tx; -- debug serial traffic to external rs232
 
 end struct;
