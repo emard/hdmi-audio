@@ -40,7 +40,7 @@ architecture struct of hdmiaudio_fleafpga is
   --signal S_hdmi_d0, S_hdmi_d1, S_hdmi_d2: std_logic;
   signal S_hdmi_d: std_logic_vector(3 downto 0);
   signal S_hdmi_clk: std_logic;
-  signal S_hdmi_bits: std_logic_vector(29 downto 0);
+  signal S_hdmi_bits: std_logic_vector(39 downto 0);
   signal tmds_d: std_logic_vector(7 downto 0);
 
   signal reset        : std_logic;
@@ -182,7 +182,8 @@ begin
 
   -- S_hdmi_bits <= S_HDMI_PD2 & S_HDMI_PD1 & S_HDMI_PD0; -- this would be normal bit order, but
   -- generic serializer follows vendor specific serializer style
-  S_hdmi_bits <=  S_HDMI_PD2(0) & S_HDMI_PD2(1) & S_HDMI_PD2(2) & S_HDMI_PD2(3) & S_HDMI_PD2(4) & S_HDMI_PD2(5) & S_HDMI_PD2(6) & S_HDMI_PD2(7) & S_HDMI_PD2(8) & S_HDMI_PD2(9) &
+  S_hdmi_bits <=  "0000011111" &
+                  S_HDMI_PD2(0) & S_HDMI_PD2(1) & S_HDMI_PD2(2) & S_HDMI_PD2(3) & S_HDMI_PD2(4) & S_HDMI_PD2(5) & S_HDMI_PD2(6) & S_HDMI_PD2(7) & S_HDMI_PD2(8) & S_HDMI_PD2(9) &
                   S_HDMI_PD1(0) & S_HDMI_PD1(1) & S_HDMI_PD1(2) & S_HDMI_PD1(3) & S_HDMI_PD1(4) & S_HDMI_PD1(5) & S_HDMI_PD1(6) & S_HDMI_PD1(7) & S_HDMI_PD1(8) & S_HDMI_PD1(9) &
                   S_HDMI_PD0(0) & S_HDMI_PD0(1) & S_HDMI_PD0(2) & S_HDMI_PD0(3) & S_HDMI_PD0(4) & S_HDMI_PD0(5) & S_HDMI_PD0(6) & S_HDMI_PD0(7) & S_HDMI_PD0(8) & S_HDMI_PD0(9);
 
