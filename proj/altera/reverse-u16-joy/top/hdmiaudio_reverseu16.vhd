@@ -9,6 +9,7 @@ entity hdmiaudio_reverseu16 is
 generic
 (
   C_audio_islands: boolean := false;
+  C_hdmi_ddr: boolean := false;
   C_hdmi_generic_serializer: boolean := true
 );
 port
@@ -31,12 +32,12 @@ port
   --hdmi_hec: out std_logic;
   --hdmi_cec: inout std_logic;
 
-  -- for vendor-specific serializer
-  hdmi_d0, hdmi_d1, hdmi_d2: out std_logic;
-  hdmi_clk: out std_logic
-  -- for generic serializer
-  --hdmi_dp, hdmi_dn: out std_logic_vector(2 downto 0);
-  --hdmi_clkp, hdmi_clkn: out std_logic
+  -- for vendor-specific differential output
+  --hdmi_d0, hdmi_d1, hdmi_d2: out std_logic;
+  --hdmi_clk: out std_logic
+  -- for generic differential output
+  hdmi_dp, hdmi_dn: out std_logic_vector(2 downto 0);
+  hdmi_clkp, hdmi_clkn: out std_logic
 );
 end;
 
@@ -52,6 +53,7 @@ architecture struct of hdmiaudio_reverseu16 is
 
   signal S_hdmi_pd0, S_hdmi_pd1, S_hdmi_pd2: std_logic_vector(9 downto 0);
   signal S_hdmi_d0, S_hdmi_d1, S_hdmi_d2: std_logic;
+  signal S_hdmi_d: std_logic_vector(3 downto 0);
   signal S_hdmi_clk: std_logic;
   signal S_hdmi_bits: std_logic_vector(29 downto 0);
   signal tmds_d: std_logic_vector(3 downto 0);
@@ -73,7 +75,7 @@ architecture struct of hdmiaudio_reverseu16 is
   signal R_beep: std_logic_vector(14 downto 0);
 begin
   G_vendorspec_hdmi:
-  if not C_hdmi_generic_serializer generate
+  if C_hdmi_ddr generate
     clkgen_125_25: entity work.clk_50M_125M_25M
     port map
     (
@@ -82,14 +84,14 @@ begin
       c1 => clk_pixel,       --  25 MHz
       locked => clock_stable
     );
-    hdmi_clk <= S_hdmi_clk;
-    hdmi_d0  <= S_hdmi_d0;
-    hdmi_d1  <= S_hdmi_d1;
-    hdmi_d2  <= S_hdmi_d2;
+    hdmi_clkp <=      S_hdmi_clk;
+    hdmi_clkn <= not  S_hdmi_clk;
+    hdmi_dp   <=     (S_hdmi_d2 & S_hdmi_d1 & S_hdmi_d0);
+    hdmi_dn   <= not (S_hdmi_d2 & S_hdmi_d1 & S_hdmi_d0);
   end generate;
 
   G_generic_serializer:
-  if C_hdmi_generic_serializer generate
+  if not C_hdmi_ddr generate
     clkgen_250_25: entity work.pll_50M_250M_25M_83M333
     port map
     (
@@ -98,10 +100,10 @@ begin
       c1 => clk_pixel,        --  25 MHz
       c2 => open              --  83.333 MHz
     );
-    --hdmi_clkp <=      S_hdmi_clk;
-    --hdmi_clkn <= not  S_hdmi_clk;
-    --hdmi_dp   <=     (S_hdmi_d2 & S_hdmi_d1 & S_hdmi_d0);
-    --hdmi_dn   <= not (S_hdmi_d2 & S_hdmi_d1 & S_hdmi_d0);
+    hdmi_clkp <=      S_hdmi_clk;
+    hdmi_clkn <= not  S_hdmi_clk;
+    hdmi_dp   <=     (S_hdmi_d2 & S_hdmi_d1 & S_hdmi_d0);
+    hdmi_dn   <= not (S_hdmi_d2 & S_hdmi_d1 & S_hdmi_d0);
   end generate;
 
   reset <= not clock_stable;
@@ -229,31 +231,31 @@ begin
                   S_HDMI_PD1(0) & S_HDMI_PD1(1) & S_HDMI_PD1(2) & S_HDMI_PD1(3) & S_HDMI_PD1(4) & S_HDMI_PD1(5) & S_HDMI_PD1(6) & S_HDMI_PD1(7) & S_HDMI_PD1(8) & S_HDMI_PD1(9) &
                   S_HDMI_PD0(0) & S_HDMI_PD0(1) & S_HDMI_PD0(2) & S_HDMI_PD0(3) & S_HDMI_PD0(4) & S_HDMI_PD0(5) & S_HDMI_PD0(6) & S_HDMI_PD0(7) & S_HDMI_PD0(8) & S_HDMI_PD0(9);
 
-  --G_generic_serializer: if C_hdmi_generic_serializer generate
-  --  generic_serializer_inst: entity work.serializer_generic
-  --  PORT MAP
-  --  (
-  --      tx_in => S_hdmi_bits,
-  --      tx_inclock => CLK_PIXEL_SHIFT, -- NOTE: generic serializer needs CLK_PIXEL x10
-  --      tx_syncclock => CLK_PIXEL,
-  --      tx_out => tmds_d
-  --  );
-  --  hdmi_clk <= tmds_d(3);
-  --  hdmi_d   <= tmds_d(2 downto 0);
-  --end generate;
-  G_vendor_specific_serializer: if not C_hdmi_generic_serializer generate
-    generic_serializer_inst: entity work.serializer
+  G_hdmi_sdr: if not C_hdmi_ddr generate
+    generic_serializer_inst: entity work.serializer_generic
     PORT MAP
     (
         tx_in => S_hdmi_bits,
-        tx_inclock => CLK_PIXEL_SHIFT, -- NOTE: vendor-specific serializer needs CLK_PIXEL x5
+        tx_inclock => CLK_PIXEL_SHIFT, -- NOTE: generic serializer needs CLK_PIXEL x10
         tx_syncclock => CLK_PIXEL,
-        tx_out => tmds_d(2 downto 0)
+        tx_out => tmds_d
     );
-    S_hdmi_clk  <= CLK_PIXEL;
-    S_hdmi_d0   <= tmds_d(0);
-    S_hdmi_d1   <= tmds_d(1);
-    S_hdmi_d2   <= tmds_d(2);
+    S_hdmi_clk <= tmds_d(3);
+    S_hdmi_d(2 downto 0) <= tmds_d(2 downto 0);
   end generate;
+  --G_vendor_specific_serializer: if not C_hdmi_generic_serializer generate
+  --  generic_serializer_inst: entity work.serializer
+  --  PORT MAP
+  --  (
+  --      tx_in => S_hdmi_bits,
+  --      tx_inclock => CLK_PIXEL_SHIFT, -- NOTE: vendor-specific serializer needs CLK_PIXEL x5
+  --      tx_syncclock => CLK_PIXEL,
+  --      tx_out => tmds_d(2 downto 0)
+  --  );
+  --  S_hdmi_clk  <= CLK_PIXEL;
+  --  S_hdmi_d0   <= tmds_d(0);
+  --  S_hdmi_d1   <= tmds_d(1);
+  --  S_hdmi_d2   <= tmds_d(2);
+  --end generate;
 
 end struct;

@@ -153,40 +153,40 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to I2C_SCL
 set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to RTC_SQW
 
 # -- HDMI (vendor-specific differential)
-set_location_assignment PIN_113 -to HDMI_CLK
-set_location_assignment PIN_112 -to "HDMI_CLK(n)"
-set_location_assignment PIN_133 -to HDMI_D0
-set_location_assignment PIN_132 -to "HDMI_D0(n)"
-set_location_assignment PIN_144 -to HDMI_D1
-set_location_assignment PIN_143 -to "HDMI_D1N"
-set_location_assignment PIN_10  -to HDMI_D2
-set_location_assignment PIN_11  -to "HDMI_D2(n)"
-set_location_assignment PIN_115 -to HDMI_CEC
-set_instance_assignment -name IO_STANDARD LVDS_E_3R -to HDMI_CLK
-set_instance_assignment -name IO_STANDARD LVDS_E_3R -to HDMI_D0
-set_instance_assignment -name IO_STANDARD "2.5V" -to HDMI_D1 # no support for LVDS_E_3R
-set_instance_assignment -name IO_STANDARD "2.5V" -to HDMI_D1N # no support for LVDS_E_3R
-set_instance_assignment -name IO_STANDARD LVDS_E_3R -to HDMI_D2
-set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to HDMI_CEC
+#set_location_assignment PIN_113 -to HDMI_CLK
+#set_location_assignment PIN_112 -to "HDMI_CLK(n)"
+#set_location_assignment PIN_133 -to HDMI_D0
+#set_location_assignment PIN_132 -to "HDMI_D0(n)"
+#set_location_assignment PIN_144 -to HDMI_D1
+#set_location_assignment PIN_143 -to "HDMI_D1N"
+#set_location_assignment PIN_10  -to HDMI_D2
+#set_location_assignment PIN_11  -to "HDMI_D2(n)"
+#set_location_assignment PIN_115 -to HDMI_CEC
+#set_instance_assignment -name IO_STANDARD LVDS_E_3R -to HDMI_CLK
+#set_instance_assignment -name IO_STANDARD LVDS_E_3R -to HDMI_D0
+#set_instance_assignment -name IO_STANDARD "2.5V" -to HDMI_D1 # no support for LVDS_E_3R
+#set_instance_assignment -name IO_STANDARD "2.5V" -to HDMI_D1N # no support for LVDS_E_3R
+#set_instance_assignment -name IO_STANDARD LVDS_E_3R -to HDMI_D2
+#set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to HDMI_CEC
 
 # -- HDMI (GPIO, generic "differential")
-#set_location_assignment PIN_113 -to "HDMI_CLKP"
-#set_location_assignment PIN_112 -to "HDMI_CLKN"
-#set_location_assignment PIN_133 -to "HDMI_DP[0]"
-#set_location_assignment PIN_132 -to "HDMI_DN[0]"
-#set_location_assignment PIN_144 -to "HDMI_DP[1]"
-#set_location_assignment PIN_143 -to "HDMI_DN[1]"
-#set_location_assignment PIN_10  -to "HDMI_DP[2]"
-#set_location_assignment PIN_11  -to "HDMI_DN[2]"
-#set_location_assignment PIN_115 -to "HDMI_CEC"
-#set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to "HDMI_CLKP"
-#set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to "HDMI_CLKN"
-#set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to "HDMI_DP[0]"
-#set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to "HDMI_DN[0]"
-#set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to "HDMI_DP[1]"
-#set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to "HDMI_DN[1]"
-#set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to "HDMI_DP[2]"
-#set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to "HDMI_DN[2]"
-#set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to "HDMI_CEC"
+set_location_assignment PIN_113 -to "HDMI_CLKP"
+set_location_assignment PIN_112 -to "HDMI_CLKN"
+set_location_assignment PIN_133 -to "HDMI_DP[0]"
+set_location_assignment PIN_132 -to "HDMI_DN[0]"
+set_location_assignment PIN_144 -to "HDMI_DP[1]"
+set_location_assignment PIN_143 -to "HDMI_DN[1]"
+set_location_assignment PIN_10  -to "HDMI_DP[2]"
+set_location_assignment PIN_11  -to "HDMI_DN[2]"
+set_location_assignment PIN_115 -to "HDMI_CEC"
+set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to "HDMI_CLKP"
+set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to "HDMI_CLKN"
+set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to "HDMI_DP[0]"
+set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to "HDMI_DN[0]"
+set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to "HDMI_DP[1]"
+set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to "HDMI_DN[1]"
+set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to "HDMI_DP[2]"
+set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to "HDMI_DN[2]"
+set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to "HDMI_CEC"
 #
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
